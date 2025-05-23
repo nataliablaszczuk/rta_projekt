@@ -4,7 +4,7 @@ from kafka import KafkaProducer
 import time
 
 producer = KafkaProducer(
-    bootstrap_servers='localhost:9092',
+    bootstrap_servers='localhost:29092',
     value_serializer=lambda v: json.dumps(v).encode('utf-8')
 )
 
@@ -13,6 +13,10 @@ def fetch_crypto_prices():
     response = requests.get(url)
     if response.status_code == 200:
         return response.json()
+    elif response.status_code == 429:
+        print("Zbyt wiele zapytań – czekam 60 sekund...")
+        time.sleep(60)
+        return {}
     else:
         print("Błąd pobierania danych:", response.status_code)
         return {}

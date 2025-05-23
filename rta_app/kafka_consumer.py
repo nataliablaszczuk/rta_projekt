@@ -6,7 +6,7 @@ crypto_data = {}
 
 consumer = KafkaConsumer(
     'crypto-prices',
-    bootstrap_servers='localhost:9092',
+    bootstrap_servers='localhost:29092',
     value_deserializer=lambda m: json.loads(m.decode('utf-8')),
     auto_offset_reset='latest',
     group_id='crypto-group'
