@@ -1,1 +1,3 @@
-# rta_projekt
+# Projekt - RTA
+
+## Aleksandra Kubala i Natalia Błaszczuk
