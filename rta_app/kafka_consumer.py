@@ -1,8 +1,11 @@
 from kafka import KafkaConsumer
 import json
 import threading
+from datetime import datetime #dodane
 
 crypto_data = {}
+previous_prices = {}  # zapamiętuje poprzednie ceny; dodane
+threshold = 0.01  # 1% zmiana; dodane
 
 consumer = KafkaConsumer(
     'crypto-prices',
@@ -12,6 +15,13 @@ consumer = KafkaConsumer(
     group_id='crypto-group'
 )
 
+#dodane log_alerts
+def log_alert(message: str):
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    entry = f"{timestamp} - {message}\n"
+    with open("alerts.log", "a") as file:
+        file.write(entry)
+        
 def consume():
     for message in consumer:
         data = message.value
@@ -19,7 +29,19 @@ def consume():
         crypto_data[coin] = {
             'price_usd': data['price_usd'],
             'timestamp': data['timestamp']
-        }
+        } #dodano if'a
+        if coin in previous_prices:
+            previous_price = previous_prices[coin]
+            change = (current_price - previous_price) / previous_price
+
+            if abs(change) >= threshold:
+                direction = "wzrost" if change > 0 else "spadek"
+                percent = round(change * 100, 2)
+                alert_msg = f"ALERT: {coin.upper()} {direction} o {percent}% ({previous_price} → {current_price})"
+                print(f"🔔 {alert_msg}")
+                log_alert(alert_msg)
+
+        previous_prices[coin] = current_price
         print("Odebrano:", data)
 
 # Uruchomienie konsumenta w tle
