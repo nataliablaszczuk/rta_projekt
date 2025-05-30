@@ -1,6 +1,7 @@
 from flask import Flask, jsonify
-from kafka_consumer import crypto_data
-import os #dodane
+from kafka_consumer import crypto_data, consume
+import threading
+import os
 
 app = Flask(__name__)
 
@@ -8,7 +9,6 @@ app = Flask(__name__)
 def get_prices():
     return jsonify(crypto_data)
 
-# start: dodane
 @app.route("/api/alerts", methods=["GET"])
 def get_alerts():
     log_path = "alerts.log"
@@ -20,7 +20,9 @@ def get_alerts():
 
     alerts = [line.strip() for line in lines if line.strip()]
     return jsonify({"alerts": alerts})
-#koniec    
 
 if __name__ == "__main__":
+    thread = threading.Thread(target=consume, daemon=True)
+    thread.start()
+
     app.run(debug=True, port=5000)

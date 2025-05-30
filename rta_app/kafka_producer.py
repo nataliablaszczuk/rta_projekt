@@ -7,7 +7,6 @@ producer = KafkaProducer(
     bootstrap_servers='localhost:29092',
     value_serializer=lambda v: json.dumps(v).encode('utf-8')
 )
-#tu dodalam 2 kryptowaluty - ola
 def fetch_crypto_prices():
     url = "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,dogecoin,solana&vs_currencies=usd"
     response = requests.get(url)
